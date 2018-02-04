@@ -4446,7 +4446,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 4
-  viewDistance: 6
+  viewDistance: 15
   state: 0
 --- !u!114 &2080757917
 MonoBehaviour:

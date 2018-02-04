@@ -22,7 +22,7 @@ public class Guard : MonoBehaviour
 
     private void Update()
     {
-        transform.LookAt(playerTransform);
+        //transform.LookAt(playerTransform);
 
         if (Vector3.Distance(transform.position, playerTransform.position) <= maxDistance)
         {

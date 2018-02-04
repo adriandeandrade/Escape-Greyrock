@@ -5,59 +5,111 @@ using UnityEngine;
 public class GuardFOV : MonoBehaviour
 {
     private Quaternion startingAngle = Quaternion.AngleAxis(-60, Vector3.up);
-    private Quaternion stepAngle = Quaternion.AngleAxis(5, Vector3.up);
-    private Quaternion viewAngle;
+    private Quaternion stepAngle = Quaternion.AngleAxis(3, Vector3.up);
     private Vector3 viewDirection;
 
     private bool canSeePlayer = false;
 
-    private RaycastHit hit;
     private Transform eyes;
+    private Transform target;
     private Guard guard;
 
-    private void Awake()
+    private void Start()
     {
         eyes = transform.GetChild(0);
         guard = GetComponent<Guard>();
+        target = FindObjectOfType<Player>().transform;
 
-        viewAngle = eyes.transform.rotation * startingAngle;
-        viewDirection = viewAngle * Vector3.forward;
+        StartCoroutine("FindTargetsWithDelay", 2f);
     }
 
     private void Update()
     {
-        DrawFOV();
+        CheckForPlayer();
         UpdateGuardState();
     }
 
-    void DrawFOV()
+    void CheckForPlayer()
     {
-        for (int i = 0; i < 24; i++)
-        {
-            if (Physics.Raycast(eyes.position, viewDirection, out hit, guard.viewDistance))
-            {
-                Player player = hit.collider.GetComponent<Player>();
-                if (player)
-                {
-                    Debug.Log("I see the player.");
-                    GlobalVariables.instance.detectionMeterValue += 0.6f;
-                }
-            }
+        Vector3 directionToTarget = target.position - transform.position;
+        float angleToTarget = Vector3.Angle(directionToTarget, transform.forward);
 
-            viewDirection = stepAngle * viewDirection;
-            Debug.DrawRay(eyes.transform.position, viewDirection * guard.viewDistance, Color.red);
+        if(angleToTarget < 30f)
+        {
+            canSeePlayer = true;
+            Debug.Log("Can see the player");
+        } else
+        {
+            canSeePlayer = false;
         }
     }
 
     void UpdateGuardState()
     {
-        if(GlobalVariables.instance.detectionMeterValue >= GlobalVariables.instance.maxDetectionMeterValue)
+        //if (detectionMeter <= 0) detectionMeter = 0;
+
+        if (!canSeePlayer && GlobalVariables.instance.detectionMeterValue >= 0.01)
+            GlobalVariables.instance.detectionMeterValue -= 1 * Time.deltaTime;
+        else
+            GlobalVariables.instance.detectionMeterValue += 1 * Time.deltaTime;
+
+        if (GlobalVariables.instance.detectionMeterValue >= GlobalVariables.instance.maxDetectionMeterValue)
         {
             GlobalVariables.instance.detectionMeterValue = GlobalVariables.instance.maxDetectionMeterValue;
-            guard.state = Guard.State.CHASE;
-            Debug.Log("Chasing player");
+            if (guard.state != Guard.State.CHASE)
+            {
+                guard.state = Guard.State.CHASE;
+                Debug.Log("Chasing player");
+            }
         }
-
-        if (GlobalVariables.instance.detectionMeterValue <= 0) GlobalVariables.instance.detectionMeterValue = 0;
     }
+
+    #region Field Of View
+
+    [Range(0, 360)]
+    public float viewAngle;
+    public float viewRadius;
+
+    public LayerMask targetMask;
+    public LayerMask obstacleMask;
+
+    void FindVisibleTargets()
+    {
+        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, viewRadius, targetMask);
+
+        for (int i = 0; i < targetsInViewRadius.Length; i++)
+        {
+            Transform targets = targetsInViewRadius[i].transform;
+            Vector3 directionToTarget = (target.position - transform.position).normalized;
+            if(Vector3.Angle(transform.forward, directionToTarget) < viewAngle / 2)
+            {
+                float distanceToTarget = Vector3.Distance(transform.position, target.position);
+
+                if(!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstacleMask))
+                {
+                    Debug.Log("Can see target");
+                }
+            }
+        }
+    }
+
+    public Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)
+    {
+        if(!angleIsGlobal)
+        {
+            angleInDegrees += transform.eulerAngles.y;
+        }
+        return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
+    }
+
+    IEnumerator FindTargetsWithDelay(float delay)
+    {
+        while(true)
+        {
+            yield return new WaitForSeconds(delay);
+            FindVisibleTargets();
+        }
+    }
+
+    #endregion
 }

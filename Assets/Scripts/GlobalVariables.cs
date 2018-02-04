@@ -5,7 +5,7 @@ using UnityEngine;
 public class GlobalVariables : MonoBehaviour
 {
     public static GlobalVariables instance;
-    public float detectionMeterValue;
+    public float detectionMeterValue = 0;
     public float maxDetectionMeterValue;
 
     private void Start()
