@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class GuardFOV : MonoBehaviour
 {
-    private Quaternion startingAngle = Quaternion.AngleAxis(-60, Vector3.up);
-    private Quaternion stepAngle = Quaternion.AngleAxis(3, Vector3.up);
     private Vector3 viewDirection;
+    public LayerMask obstacleMask;
 
     private bool canSeePlayer = false;
+    [SerializeField] private int detectionAmount;
+    [SerializeField] public float viewAngle;
 
     private Transform eyes;
     private Transform target;
@@ -19,29 +20,32 @@ public class GuardFOV : MonoBehaviour
         eyes = transform.GetChild(0);
         guard = GetComponent<Guard>();
         target = FindObjectOfType<Player>().transform;
-
-        StartCoroutine("FindTargetsWithDelay", 2f);
     }
 
     private void Update()
     {
-        CheckForPlayer();
+        if (CanSeePlayer()) canSeePlayer = true;
+        if (!CanSeePlayer()) canSeePlayer = false;
+
         UpdateGuardState();
     }
 
-    void CheckForPlayer()
+    bool CanSeePlayer()
     {
-        Vector3 directionToTarget = target.position - transform.position;
-        float angleToTarget = Vector3.Angle(directionToTarget, transform.forward);
-
-        if(angleToTarget < 30f)
+        Transform target = FindObjectOfType<Player>().transform;
+        if(Vector3.Distance(transform.position, target.position) < guard.viewDistance)
         {
-            canSeePlayer = true;
-            Debug.Log("Can see the player");
-        } else
-        {
-            canSeePlayer = false;
+            Vector3 directionToPlayer = (target.position - transform.position).normalized;
+            float angleBetweenGuardAndPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+            if(angleBetweenGuardAndPlayer < viewAngle / 2f)
+            {
+                if(!Physics.Linecast(transform.position, target.position, obstacleMask))
+                {
+                    return true;
+                }
+            } 
         }
+        return false;
     }
 
     void UpdateGuardState()
@@ -49,9 +53,9 @@ public class GuardFOV : MonoBehaviour
         //if (detectionMeter <= 0) detectionMeter = 0;
 
         if (!canSeePlayer && GlobalVariables.instance.detectionMeterValue >= 0.01)
-            GlobalVariables.instance.detectionMeterValue -= 1 * Time.deltaTime;
+            GlobalVariables.instance.detectionMeterValue -= (detectionAmount / 2) * Time.deltaTime;
         else
-            GlobalVariables.instance.detectionMeterValue += 1 * Time.deltaTime;
+            GlobalVariables.instance.detectionMeterValue += detectionAmount * Time.deltaTime;
 
         if (GlobalVariables.instance.detectionMeterValue >= GlobalVariables.instance.maxDetectionMeterValue)
         {
@@ -64,52 +68,9 @@ public class GuardFOV : MonoBehaviour
         }
     }
 
-    #region Field Of View
-
-    [Range(0, 360)]
-    public float viewAngle;
-    public float viewRadius;
-
-    public LayerMask targetMask;
-    public LayerMask obstacleMask;
-
-    void FindVisibleTargets()
+    void OnDrawGizmos()
     {
-        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, viewRadius, targetMask);
-
-        for (int i = 0; i < targetsInViewRadius.Length; i++)
-        {
-            Transform targets = targetsInViewRadius[i].transform;
-            Vector3 directionToTarget = (target.position - transform.position).normalized;
-            if(Vector3.Angle(transform.forward, directionToTarget) < viewAngle / 2)
-            {
-                float distanceToTarget = Vector3.Distance(transform.position, target.position);
-
-                if(!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstacleMask))
-                {
-                    Debug.Log("Can see target");
-                }
-            }
-        }
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(transform.position, transform.forward * guard.viewDistance);
     }
-
-    public Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)
-    {
-        if(!angleIsGlobal)
-        {
-            angleInDegrees += transform.eulerAngles.y;
-        }
-        return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
-    }
-
-    IEnumerator FindTargetsWithDelay(float delay)
-    {
-        while(true)
-        {
-            yield return new WaitForSeconds(delay);
-            FindVisibleTargets();
-        }
-    }
-
-    #endregion
 }
