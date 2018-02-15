@@ -68,9 +68,16 @@ public class GuardFOV : MonoBehaviour
         }
     }
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(transform.position, transform.forward * guard.viewDistance);
-    }
+//#if UNITY_EDITOR
+
+//    void OnDrawGizmos()
+//    {
+//        if(Application.isEditor)
+//        {
+//            Gizmos.color = Color.red;
+//            Gizmos.DrawLine(transform.position, transform.forward * guard.viewDistance);
+//        }
+//    }
+
+//#endif
 }

@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: c2cda1d52609418409ff4829d4f9bcdd
-timeCreated: 1517542758
+guid: 238c68717229b814db4bc6e620f92a08
+timeCreated: 1518646918
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName: {}
@@ -9,7 +9,7 @@ TextureImporter:
   mipmaps:
     mipMapMode: 0
     enableMipMap: 1
-    sRGBTexture: 0
+    sRGBTexture: 1
     linearTexture: 0
     fadeOut: 0
     borderMipMap: 0
@@ -18,9 +18,9 @@ TextureImporter:
     mipMapFadeDistanceStart: 1
     mipMapFadeDistanceEnd: 3
   bumpmap:
-    convertToNormalMap: 1
+    convertToNormalMap: 0
     externalNormalMap: 0
-    heightScale: 0.141
+    heightScale: 0.25
     normalMapFilter: 0
   isReadable: 0
   grayScaleToAlpha: 0
@@ -50,27 +50,17 @@ TextureImporter:
   alphaUsage: 1
   alphaIsTransparency: 0
   spriteTessellationDetail: -1
-  textureType: 1
+  textureType: 0
   textureShape: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
   platformSettings:
   - buildTarget: DefaultTexturePlatform
-    maxTextureSize: 1024
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-  - buildTarget: Standalone
-    maxTextureSize: 1024
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0

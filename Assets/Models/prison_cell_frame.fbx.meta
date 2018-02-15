@@ -1,27 +1,16 @@
 fileFormatVersion: 2
-guid: 4b198fcb41cd72e4f859431e2bc94b7b
-timeCreated: 1517544416
+guid: 2531ae05ed1a40846ab173b24f02a2e0
+timeCreated: 1518646941
 licenseType: Free
 ModelImporter:
   serializedVersion: 22
   fileIDToRecycleName:
-    100000: cell_door
-    100002: cell_walls
-    100004: //RootNode
-    400000: cell_door
-    400002: cell_walls
-    400004: //RootNode
-    2100000: mat_cell_door
-    2100002: mat_cell_door_frame
-    2100004: No Name
-    2300000: cell_door
-    2300002: cell_walls
-    2300004: //RootNode
-    3300000: cell_door
-    3300002: cell_walls
-    3300004: //RootNode
-    4300000: cell_door
-    4300002: cell_walls
+    100000: //RootNode
+    400000: //RootNode
+    2100000: frame
+    2300000: //RootNode
+    3300000: //RootNode
+    4300000: framelp
   externalObjects: {}
   materials:
     importMaterials: 1
@@ -52,7 +41,7 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 1
+    globalScale: 0.5
     meshCompression: 0
     addColliders: 0
     importVisibility: 1
